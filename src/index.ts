@@ -1,13 +1,36 @@
-import express from "express";
+import express from 'express';
+import mongoose from 'mongoose';
+
+// -=- Schemas -=-
+import Members from './models/members';
+import RecentMemberData from './models/recent_member_data';
+
+import secrets from './secrets';
+
+
+mongoose.connect(secrets.ReadOnlyMongoCreds)
 const app = express();
-const port = 8080; // default port to listen
+const port = 5;
 
-// define a route handler for the default home page
-app.get('/', (req, res) => {
-  res.send('Hello world!');
+// TODO: Add erorr handling
+
+// -=- MLA Data -=-
+app.get('/mla', async (req, res) => {
+  const members = await Members.find({ active: true })
+  res.jsonp(members)
 });
 
-// start the Express server
-app.listen(port, () => {
-  console.log(`server started at http://localhost:${port}`);
+app.get('/mla/:mla', async (req, res) => {
+  const mla = req.params.mla.replace('-', ' ')
+  const member = await Members.findOne({ _id: mla })
+  res.jsonp(member)
 });
+
+app.get('/mla/:mla/recent_data', async (req, res) => {
+  const mla = req.params.mla.replace('-', ' ')
+  const recentMemberData = await RecentMemberData.findOne({ _id: mla })
+  res.jsonp(recentMemberData)
+});
+
+// -=- Start The Express Server -=- 
+app.listen(port);
