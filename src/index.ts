@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 // -=- Schemas -=-
 import Members from './models/members';
@@ -12,7 +13,9 @@ mongoose.connect(secrets.ReadOnlyMongoCreds)
 const app = express();
 const port = 5;
 
-// TODO: Add erorr handling
+app.use(cors())
+
+// TODO: Add eror handling
 
 // -=- MLA Data -=-
 app.get('/mla', async (req, res) => {
@@ -28,7 +31,14 @@ app.get('/mla/:mla', async (req, res) => {
 
 app.get('/mla/:mla/recent_data', async (req, res) => {
   const mla = req.params.mla.replace('-', ' ')
-  const recentMemberData = await RecentMemberData.findOne({ _id: mla })
+  let recentMemberData = await RecentMemberData.findOne({ _id: mla })
+  console.log(recentMemberData)
+  recentMemberData = {
+    _id: recentMemberData._id,
+    recent_votes: recentMemberData.recent_votes.slice(Math.min(0, recentMemberData.recent_votes.length-1, 4)),
+    recent_debates: recentMemberData.recent_debates.slice(Math.min(0, recentMemberData.recent_debates.length-1, 4)),
+  }
+  console.log(recentMemberData)
   res.jsonp(recentMemberData)
 });
 
