@@ -5,6 +5,7 @@ import cors from 'cors';
 // -=- Schemas -=-
 import Members from './models/members';
 import RecentMemberData from './models/recent_member_data';
+import Debates from './models/debate_day';
 
 import secrets from './secrets';
 
@@ -32,15 +33,29 @@ app.get('/mla/:mla', async (req, res) => {
 app.get('/mla/:mla/recent_data', async (req, res) => {
   const mla = req.params.mla.replace('-', ' ')
   let recentMemberData = await RecentMemberData.findOne({ _id: mla })
-  console.log(recentMemberData)
   recentMemberData = {
     _id: recentMemberData._id,
     recent_votes: recentMemberData.recent_votes.slice(Math.min(0, recentMemberData.recent_votes.length-1, 4)),
     recent_debates: recentMemberData.recent_debates.slice(Math.min(0, recentMemberData.recent_debates.length-1, 4)),
   }
-  console.log(recentMemberData)
   res.jsonp(recentMemberData)
 });
+
+app.get('/debates', async (req, res) => {
+  const debateIndexes = await (await Debates.find({}, '_id')).flatMap(x => x['_id'])
+  res.jsonp(debateIndexes)
+})
+
+app.get('/debates/:date', async (req, res) => {
+  const debateDataAtDate = await Debates.findOne({ _id: req.params.date })
+  res.jsonp(debateDataAtDate.data)
+})
+
+
+app.get('/debates/:date/:index', async (req, res) => {
+  const debateDataAtDate = await Debates.findOne({ _id: req.params.date })
+  res.jsonp(debateDataAtDate.data[+req.params.index])
+})
 
 // -=- Start The Express Server -=- 
 app.listen(port);
