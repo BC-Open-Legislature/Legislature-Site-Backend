@@ -42,8 +42,8 @@ app.get('/mla/:mla/recent_data', async (req, res) => {
 });
 
 app.get('/debates', async (req, res) => {
-  const debateIndexes = await (await Debates.find({}, '_id')).flatMap(x => x['_id'])
-  res.jsonp(debateIndexes)
+  const debateIndexes = await (await Debates.find({}, 'date')).flatMap(x => x['date'])
+  res.jsonp(debateIndexes.reverse())
 })
 
 app.get('/debates/:date', async (req, res) => {
