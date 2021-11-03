@@ -2,6 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 
+// -=- Interfaces -=-
+import { foundDates } from './interfaces';
+
 // -=- Schemas -=-
 import Members from './models/members';
 import RecentMemberData from './models/recent_member_data';
@@ -41,9 +44,62 @@ app.get('/mla/:mla/recent_data', async (req, res) => {
   res.jsonp(recentMemberData)
 });
 
-app.get('/debates', async (req, res) => {
-  const debateIndexes = await (await Debates.find({}, 'date')).flatMap(x => x['date'])
-  res.jsonp(debateIndexes.reverse())
+app.get('/debates/indexes', async (req, res) => {
+  const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
+  let foundYears: foundDates = {}
+  let filteredDebateIndexes = {
+    recent_debates: debateIndexes.slice(-6).reverse(),
+    date_indexes: debateIndexes.map(
+      x => { 
+        const year = x.substr(0, 4)
+        if (!(year in foundYears)) {
+          foundYears[year] = ''
+          return year
+        } 
+      }
+    ).filter(x => { return x != null })
+  }
+  
+  res.jsonp(filteredDebateIndexes)
+})
+
+app.get('/debates/indexes/:year', async (req, res) => {
+  const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
+  let foundMonths: foundDates = {}
+  let filteredDebateIndexes = {
+    date_indexes: debateIndexes.map(
+      x => { 
+        const month = x.substr(4, 2)
+        const year = req.params.year
+        if (!(month in foundMonths) && year === x.substr(0, 4)) {
+          foundMonths[month] = ''
+          return month
+        } 
+      }
+    ).filter(x => { return x != null })
+  }
+  
+  res.jsonp(filteredDebateIndexes)
+})
+
+app.get('/debates/indexes/:year/:month', async (req, res) => {
+  const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
+  let foundDays: foundDates = {}
+  let filteredDebateIndexes = {
+    date_indexes: debateIndexes.map(
+      x => { 
+        const day = x.substr(6, 2)
+        const year = req.params.year
+        const month = req.params.month
+        if (!(month in foundDays) && year === x.substr(0, 4) && month == x.substr(4, 2)) {
+          foundDays[day] = ''
+          return day
+        } 
+      }
+    ).filter(x => { return x != null })
+  }
+
+  res.jsonp(filteredDebateIndexes)
 })
 
 app.get('/debates/:date', async (req, res) => {
