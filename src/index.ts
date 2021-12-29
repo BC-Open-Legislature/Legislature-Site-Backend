@@ -44,6 +44,11 @@ app.get('/mla/:mla/recent_data', async (req, res) => {
   res.jsonp(recentMemberData)
 });
 
+app.get('/debates/', async (req, res) => {
+  const debateIndexes = (await Debates.find({}, 'date').sort({'date': -1}).limit(16)).flatMap(x => x['date'])  
+  res.jsonp(debateIndexes)
+})
+
 app.get('/debates/indexes', async (req, res) => {
   const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
   let foundYears: foundDates = {}
