@@ -70,18 +70,17 @@ app.get('/debates/indexes', async (req, res) => {
 app.get('/debates/indexes/:year', async (req, res) => {
   const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
   let foundMonths: foundDates = {}
-  let filteredDebateIndexes = {
-    date_indexes: debateIndexes.map(
-      x => { 
-        const month = x.substr(4, 2)
-        const year = req.params.year
-        if (!(month in foundMonths) && year === x.substr(0, 4)) {
-          foundMonths[month] = ''
-          return month
-        } 
-      }
-    ).filter(x => { return x != null })
-  }
+  let filteredDebateIndexes = debateIndexes.map(
+    x => { 
+      const month = x.substr(4, 2)
+      const year = req.params.year
+      if (!(month in foundMonths) && year === x.substr(0, 4)) {
+        foundMonths[month] = ''
+        return month
+      } 
+    }
+  )
+    .filter(x => { return x != null });
   
   res.jsonp(filteredDebateIndexes)
 })
