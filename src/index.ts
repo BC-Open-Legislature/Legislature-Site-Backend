@@ -52,18 +52,15 @@ app.get('/debates/', async (req, res) => {
 app.get('/debates/indexes', async (req, res) => {
   const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
   let foundYears: foundDates = {}
-  let filteredDebateIndexes = {
-    recent_debates: debateIndexes.slice(-6).reverse(),
-    date_indexes: debateIndexes.map(
-      x => { 
-        const year = x.substr(0, 4)
-        if (!(year in foundYears)) {
-          foundYears[year] = ''
-          return year
-        } 
-      }
-    ).filter(x => { return x != null })
-  }
+  let filteredDebateIndexes = debateIndexes.map(
+    x => { 
+      const year = x.substr(0, 4)
+      if (!(year in foundYears)) {
+        foundYears[year] = ''
+        return year
+      } 
+    }
+  ).filter(x => { return x != null })
   
   res.jsonp(filteredDebateIndexes)
 })
