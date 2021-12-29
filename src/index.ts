@@ -60,7 +60,9 @@ app.get('/debates/indexes', async (req, res) => {
         return year
       } 
     }
-  ).filter(x => { return x != null })
+  )
+    .filter(x => { return x != null })
+    .reverse();
   
   res.jsonp(filteredDebateIndexes)
 })
