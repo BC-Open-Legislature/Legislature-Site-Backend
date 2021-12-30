@@ -54,7 +54,7 @@ app.get('/debates/indexes', async (req, res) => {
   let foundYears: foundDates = {}
   let filteredDebateIndexes = debateIndexes.map(
     x => { 
-      const year = x.substr(0, 4)
+      const year = x.substring(0, 4)
       if (!(year in foundYears)) {
         foundYears[year] = ''
         return year
@@ -68,40 +68,15 @@ app.get('/debates/indexes', async (req, res) => {
 })
 
 app.get('/debates/indexes/:year', async (req, res) => {
-  const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
-  let foundMonths: foundDates = {}
-  let filteredDebateIndexes = debateIndexes.map(
-    x => { 
-      const month = x.substr(4, 2)
-      const year = req.params.year
-      if (!(month in foundMonths) && year === x.substr(0, 4)) {
-        foundMonths[month] = ''
-        return month
-      } 
-    }
-  )
-    .filter(x => { return x != null });
+  const year = req.params.year
+  const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date']).filter((x) => year === x.substring(0, 4))
+  // EROXL: Not sure of a better way of doing this sorry to anyone that reads this
+  const filteredDebateIndexes: string[][] = [[], [], [], [], [], [], [], [], [], [], [], []]
+
+  debateIndexes.forEach((index) => {
+    filteredDebateIndexes[+index.substring(4, 6)].push(index)
+  });
   
-  res.jsonp(filteredDebateIndexes)
-})
-
-app.get('/debates/indexes/:year/:month', async (req, res) => {
-  const debateIndexes = (await Debates.find({}, 'date')).flatMap(x => x['date'])
-  let foundDays: foundDates = {}
-  let filteredDebateIndexes = {
-    date_indexes: debateIndexes.map(
-      x => { 
-        const day = x.substr(6, 2)
-        const year = req.params.year
-        const month = req.params.month
-        if (!(month in foundDays) && year === x.substr(0, 4) && month == x.substr(4, 2)) {
-          foundDays[day] = ''
-          return day
-        } 
-      }
-    ).filter(x => { return x != null })
-  }
-
   res.jsonp(filteredDebateIndexes)
 })
 
