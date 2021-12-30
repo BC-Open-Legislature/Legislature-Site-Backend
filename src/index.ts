@@ -82,7 +82,8 @@ app.get('/debates/indexes/:year', async (req, res) => {
 })
 
 app.get('/debates/:date/', async (req, res) => {
-  const debateDataAtDate = await Debates.findOne({ _id: req.params.date }).skip(((+req.query.page - 1) * 25)).limit(25)
+  const page = req.query.page !== undefined ? (+req.query.page - 1) * 25 : 0
+  const debateDataAtDate = await Debates.findOne({ _id: req.params.date }).skip((page)).limit(25)
   res.jsonp(debateDataAtDate.data)
 })
 
