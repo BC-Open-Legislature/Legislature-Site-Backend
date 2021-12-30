@@ -20,6 +20,7 @@ const port = 5;
 app.use(cors())
 
 // TODO: Add eror handling
+// TODO: Move all these routes into different paths so this script is cleaner
 
 // -=- MLA Data -=-
 app.get('/mla', async (req, res) => {
