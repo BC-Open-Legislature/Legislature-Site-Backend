@@ -6,7 +6,7 @@
   "scripts": {
     "docker-build": "docker build -t legislature-site-backend .",
     "docker-run": "docker run -d -p 80:8080 legislature-site-backend",
-    "prebuild": "eslint -c estlintrc.js",
+    "prebuild": "eslint -c .eslintrc.js",
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node ."

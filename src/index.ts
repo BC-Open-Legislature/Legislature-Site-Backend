@@ -82,15 +82,14 @@ app.get('/debates/indexes/:year', async (req, res) => {
 })
 
 app.get('/debates/:date/', async (req, res) => {
-  const page = req.query.page !== undefined ? (+req.query.page - 1) * 25 : 0
-  const debateDataAtDate: {data: any[]} = await Debates.findOne({ _id: req.params.date }, 'data')
-  res.jsonp(debateDataAtDate.data.slice(page, page+25))
-})
-
-
-app.get('/debates/:date/:index', async (req, res) => {
-  const debateDataAtDate = await Debates.findOne({ _id: req.params.date })
-  res.jsonp(debateDataAtDate.data[+req.params.index])
+  const page = req.query.page !== undefined ? (+req.query.page - 1) * 25 : 0;
+  const debateDataAtDate: {data: any[]} = await Debates.findOne({ _id: req.params.date }, 'data');
+  res.jsonp(
+    {
+      data: debateDataAtDate.data.slice(page, page+25),
+      length: Math.ceil(debateDataAtDate.data.length / 25),
+    }
+  );
 })
 
 // -=- Start The Express Server -=- 
